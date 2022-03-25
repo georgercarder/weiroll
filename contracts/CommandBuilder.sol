@@ -38,7 +38,8 @@ library CommandBuilder {
                         arglen % 32 == 0,
                         "Dynamic state variables must be a multiple of 32 bytes"
                     );
-                    count += arglen + 32;
+		    unchecked{arglen+=32;}
+                    count += arglen;
                     unchecked{free += 32;}
                 }
             } else {
@@ -46,13 +47,14 @@ library CommandBuilder {
                     state[idx & IDX_VALUE_MASK].length == 32,
                     "Static state variables must be 32 bytes"
                 );
-                unchecked{count += 32;}
-                free += 32;
+                count += 32;
+                unchecked{free += 32;}
             }
         }
 
         // Encode it
-        ret = new bytes(count + 4);
+	unchecked{count+=4;}
+        ret = new bytes(count);
         assembly {
             mstore(add(ret, 32), selector)
         }
